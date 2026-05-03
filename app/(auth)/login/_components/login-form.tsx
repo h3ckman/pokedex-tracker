@@ -47,16 +47,14 @@ export function LoginForm() {
   }, [errorCode]);
 
   return (
-    <Card className="w-full gap-6 border-0 bg-transparent py-0 ring-0">
-      <CardHeader className="px-0">
+    <Card className="w-full gap-6 border-0 bg-transparent  py-0 ring-0">
+      <CardHeader>
         <CardTitle className="text-3xl font-light tracking-tight">
           Welcome back
         </CardTitle>
-        <CardDescription className="mt-1">
-          Sign in to continue.
-        </CardDescription>
+        <CardDescription className="mt-1">Sign in to continue.</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-5 px-0">
+      <CardContent className="flex flex-col gap-5">
         <form action={formAction} className="flex flex-col gap-4">
           <input type="hidden" name="next" value={next} />
           <div className="flex flex-col gap-2">
