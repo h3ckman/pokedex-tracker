@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getSession } from "@/lib/auth/session";
+import { prisma } from "@/lib/prisma";
 
 export default async function AuthedLayout({
   children,
@@ -18,12 +19,28 @@ export default async function AuthedLayout({
   if (!session) redirect("/login");
   if (!session.user.emailVerified) redirect("/verify-email");
 
+  const pokemon = await prisma.pokemon.findMany({
+    orderBy: { nationalDexNumber: "asc" },
+    select: {
+      id: true,
+      nationalDexNumber: true,
+      name: true,
+      generation: true,
+      region: true,
+      spriteUrl: true,
+      entries: {
+        distinct: ["gameSystem"],
+        select: { gameSystem: true },
+      },
+    },
+  });
+
   return (
     <TooltipProvider>
       <SidebarProvider
         style={{ "--sidebar-width": "16rem" } as React.CSSProperties}
       >
-        <AppSidebar user={session.user} />
+        <AppSidebar user={session.user} pokemon={pokemon} />
         <SidebarInset>
           <header className="flex h-14 shrink-0 items-center gap-2">
             <div className="flex flex-1 items-center gap-2 px-3">

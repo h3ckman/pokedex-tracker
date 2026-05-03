@@ -4,7 +4,9 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 
 import { NavSecondary } from "./nav-secondary";
+import { PokemonSidebarNav } from "./pokemon-sidebar-nav";
 import { UserMenu } from "./user-menu";
+import type { SidebarPokemon } from "./pokemon-grouping";
 import type { Role } from "@/lib/generated/prisma/client";
 import {
   Sidebar,
@@ -12,6 +14,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { MessageCircleQuestionIcon, Settings2Icon } from "lucide-react";
 
@@ -23,9 +26,11 @@ type NavItem = {
 
 export function AppSidebar({
   user,
+  pokemon,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   user: { name: string; email: string; role: Role };
+  pokemon: SidebarPokemon[];
 }) {
   const pathname = usePathname();
 
@@ -44,11 +49,9 @@ export function AppSidebar({
         <div className="px-2 py-1 text-sm font-medium">Pokédex Tracker</div>
       </SidebarHeader>
       <SidebarContent>
-        <NavSecondary
-          items={filteredSecondary}
-          pathname={pathname}
-          className="mt-auto"
-        />
+        <PokemonSidebarNav pokemon={pokemon} />
+        <SidebarSeparator className="mt-auto" />
+        <NavSecondary items={filteredSecondary} pathname={pathname} />
       </SidebarContent>
       <SidebarFooter>
         <UserMenu user={user} role={user.role} />

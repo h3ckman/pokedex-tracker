@@ -17,6 +17,27 @@ enum Role {
   VIEWER
 }
 
+enum Region {
+  KANTO
+  JOHTO
+  HOENN
+  SINNOH
+  UNOVA
+  KALOS
+  ALOLA
+  GALAR
+  PALDEA
+}
+
+enum GameSystem {
+  GAME_BOY
+  GAME_BOY_COLOR
+  GAME_BOY_ADVANCE
+  NINTENDO_DS
+  NINTENDO_3DS
+  NINTENDO_SWITCH
+}
+
 
 model User {
   id            String    @id @default(cuid())
@@ -83,5 +104,38 @@ model AuditLog {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model Pokemon {
+  id                String   @id @default(cuid())
+  nationalDexNumber Int      @unique
+  name              String
+  generation        Int
+  region            Region
+  spriteUrl         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  entries PokedexEntry[]
+
+  @@index([name])
+  @@index([generation])
+  @@index([region])
+}
+
+model PokedexEntry {
+  id          String     @id @default(cuid())
+  pokemonId   String
+  pokemon     Pokemon    @relation(fields: [pokemonId], references: [id], onDelete: Cascade)
+  gameTitle   String
+  gameSystem  GameSystem
+  regionName  String
+  entryNumber Int?
+  flavorText  String?
+  createdAt   DateTime   @default(now())
+
+  @@unique([pokemonId, gameTitle])
+  @@index([pokemonId])
+  @@index([gameSystem])
 }
 
