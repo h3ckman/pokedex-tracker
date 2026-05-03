@@ -35,10 +35,10 @@ export function RegisterForm() {
     <Card className="w-full gap-6 border-0 bg-transparent py-0 ring-0">
       <CardHeader className="px-0">
         <CardTitle className="text-3xl font-light tracking-tight">
-          Begin your saga
+          Create your account
         </CardTitle>
         <CardDescription className="mt-1">
-          Create an account to start managing your campaigns.
+          Sign up to get started.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5 px-0">

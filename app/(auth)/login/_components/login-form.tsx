@@ -53,7 +53,7 @@ export function LoginForm() {
           Welcome back
         </CardTitle>
         <CardDescription className="mt-1">
-          Sign in to continue your campaign.
+          Sign in to continue.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5 px-0">

@@ -34,7 +34,7 @@ npm install
 
 ### 2. Start the database
 
-A `docker-compose.yml` is provided to run PostgreSQL 17 locally on port **5435**:
+A `docker-compose.yml` is provided to run PostgreSQL 18 locally on port **5436**:
 
 ```bash
 docker compose up -d
@@ -59,10 +59,10 @@ node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))'
 ### 4. Run database migrations
 
 ```bash
-npx prisma migrate deploy
+npx prisma migrate dev --name init
 ```
 
-This applies all migrations from `prisma/migrations/` to your local database.
+This creates the initial migration in `prisma/migrations/` and applies it to your local database. On subsequent runs, use `npx prisma migrate deploy` to apply existing migrations.
 
 ### 5. Generate the Prisma client
 
@@ -78,12 +78,11 @@ The generated client is output to `lib/generated/prisma/` (gitignored).
 npx prisma db seed
 ```
 
-Creates two sample users (defined in `prisma/seed.ts`):
+Creates one sample admin user (defined in `prisma/seed.ts`):
 
-| Email                | Password       | Role   |
-| -------------------- | -------------- | ------ |
-| `admin@example.com`  | `ChangeMe123!` | ADMIN  |
-| `viewer@example.com` | `ChangeMe123!` | VIEWER |
+| Email               | Password   | Role  |
+| ------------------- | ---------- | ----- |
+| `admin@example.com` | `password` | ADMIN |
 
 ### 7. Start the dev server
 
@@ -106,7 +105,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser and sign in 
 ## Project Structure
 
 ```
-nextjs-template/
+pokedex-tracker/
 ├── app/
 │   ├── layout.tsx              # Root layout
 │   ├── globals.css             # Global styles and Tailwind imports
@@ -159,10 +158,12 @@ Sessions are JWT-signed (via [jose](https://github.com/panva/jose)) and stored i
 
 ### Schema
 
-Three models (see `prisma/schema.prisma`):
+Five models (see `prisma/schema.prisma`):
 
 - **User** — email, name, password hash, `role`, `active` flag
 - **Session** — JWT-backed server-side session rows with expiry
+- **OAuthAccount** — links a user to an external OAuth provider account (Google)
+- **EmailVerificationCode** — one-time codes for email verification
 - **AuditLog** — security-sensitive action log (login, role change, etc.)
 
 ### Creating a new migration
