@@ -36,6 +36,12 @@ type SeedPokemon = {
   weight: number;
   abilities: string[];
   genus: string | null;
+  hp: number;
+  attack: number;
+  defense: number;
+  specialAttack: number;
+  specialDefense: number;
+  speed: number;
   flavorTexts: FlavorText[];
 };
 
@@ -143,6 +149,12 @@ async function seedPokemon(): Promise<{ pokemonCount: number; entryCount: number
           weight: row.weight,
           abilities: row.abilities,
           genus: row.genus,
+          hp: row.hp,
+          attack: row.attack,
+          defense: row.defense,
+          specialAttack: row.specialAttack,
+          specialDefense: row.specialDefense,
+          speed: row.speed,
         };
         return prisma.pokemon.upsert({
           where: { nationalDexNumber: row.nationalDexNumber },

@@ -140,6 +140,12 @@ model Pokemon {
   weight            Int?
   abilities         String[]
   genus             String?
+  hp                Int?
+  attack            Int?
+  defense           Int?
+  specialAttack     Int?
+  specialDefense    Int?
+  speed             Int?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 

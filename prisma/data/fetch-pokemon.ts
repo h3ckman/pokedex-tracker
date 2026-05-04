@@ -26,6 +26,12 @@ type PokemonRow = {
   weight: number;
   abilities: string[];
   genus: string | null;
+  hp: number;
+  attack: number;
+  defense: number;
+  specialAttack: number;
+  specialDefense: number;
+  speed: number;
   flavorTexts: FlavorText[];
 };
 
@@ -72,6 +78,7 @@ type PokemonResponse = {
   weight: number;
   types: { type: { name: string } }[];
   abilities: { ability: { name: string }; is_hidden: boolean }[];
+  stats: { base_stat: number; stat: { name: string } }[];
 };
 
 async function fetchOne(id: number): Promise<PokemonRow> {
@@ -102,6 +109,10 @@ async function fetchOne(id: number): Promise<PokemonRow> {
     });
   }
 
+  const statByName = new Map(
+    pokemon.stats.map((s) => [s.stat.name, s.base_stat]),
+  );
+
   return {
     nationalDexNumber: species.id,
     name: titleCase(species.name),
@@ -116,6 +127,12 @@ async function fetchOne(id: number): Promise<PokemonRow> {
       titleCase(a.ability.name) + (a.is_hidden ? " (Hidden)" : ""),
     ),
     genus: englishGenus,
+    hp: statByName.get("hp") ?? 0,
+    attack: statByName.get("attack") ?? 0,
+    defense: statByName.get("defense") ?? 0,
+    specialAttack: statByName.get("special-attack") ?? 0,
+    specialDefense: statByName.get("special-defense") ?? 0,
+    speed: statByName.get("speed") ?? 0,
     flavorTexts,
   };
 }

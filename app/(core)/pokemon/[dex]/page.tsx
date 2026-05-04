@@ -1,16 +1,12 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pokeball } from "@/components/icons/pokeball";
 import type { GameSystem } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
+import { StatBars } from "./_components/stat-bars";
 import { TypeBadge } from "./_components/type-badge";
-
-const TOTAL_POKEMON = 1000;
 
 const REGION_LABEL: Record<string, string> = {
   KANTO: "Kanto",
@@ -85,30 +81,8 @@ export default async function PokemonDetailPage({
   }
   const orderedSystems = SYSTEM_ORDER.filter((s) => entriesBySystem.has(s));
 
-  const prevDex = dexNumber > 1 ? dexNumber - 1 : null;
-  const nextDex = dexNumber < TOTAL_POKEMON ? dexNumber + 1 : null;
-
   return (
     <div className="mx-auto w-full max-w-4xl space-y-8">
-      <nav className="flex items-center justify-between text-sm">
-        {prevDex ? (
-          <Button variant="ghost" size="sm" render={<Link href={`/pokemon/${prevDex}`} />}>
-            <ChevronLeftIcon />
-            <span className="tabular-nums">#{pad4(prevDex)}</span>
-          </Button>
-        ) : (
-          <span />
-        )}
-        {nextDex ? (
-          <Button variant="ghost" size="sm" render={<Link href={`/pokemon/${nextDex}`} />}>
-            <span className="tabular-nums">#{pad4(nextDex)}</span>
-            <ChevronRightIcon />
-          </Button>
-        ) : (
-          <span />
-        )}
-      </nav>
-
       <header className="flex flex-col items-center gap-6 sm:flex-row sm:items-end">
         <div className="relative flex size-48 shrink-0 items-center justify-center rounded-2xl bg-muted/50 ring-1 ring-border sm:size-56">
           {pokemon.artworkUrl || pokemon.spriteUrl ? (
@@ -152,6 +126,15 @@ export default async function PokemonDetailPage({
           sub={pokemon.abilities.slice(1).join(" · ") || undefined}
         />
       </div>
+
+      <StatBars
+        hp={pokemon.hp}
+        attack={pokemon.attack}
+        defense={pokemon.defense}
+        specialAttack={pokemon.specialAttack}
+        specialDefense={pokemon.specialDefense}
+        speed={pokemon.speed}
+      />
 
       <section className="space-y-4">
         <div className="flex items-baseline justify-between">
