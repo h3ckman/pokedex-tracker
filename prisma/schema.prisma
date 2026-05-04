@@ -38,6 +38,27 @@ enum GameSystem {
   NINTENDO_SWITCH
 }
 
+enum PokemonType {
+  NORMAL
+  FIRE
+  WATER
+  GRASS
+  ELECTRIC
+  ICE
+  FIGHTING
+  POISON
+  GROUND
+  FLYING
+  PSYCHIC
+  BUG
+  ROCK
+  GHOST
+  DRAGON
+  DARK
+  STEEL
+  FAIRY
+}
+
 
 model User {
   id            String    @id @default(cuid())
@@ -107,14 +128,20 @@ model AuditLog {
 }
 
 model Pokemon {
-  id                String   @id @default(cuid())
-  nationalDexNumber Int      @unique
+  id                String        @id @default(cuid())
+  nationalDexNumber Int           @unique
   name              String
   generation        Int
   region            Region
   spriteUrl         String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  artworkUrl        String?
+  types             PokemonType[]
+  height            Int?
+  weight            Int?
+  abilities         String[]
+  genus             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
   entries PokedexEntry[]
 
