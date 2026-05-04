@@ -60,7 +60,7 @@ export function RegisterForm() {
       </div>
 
       <CardHeader className="text-center">
-        <CardTitle className="font-heading text-4xl font-medium italic tracking-tight">
+        <CardTitle className="font-heading text-4xl font-medium tracking-tight">
           Start your Pokédex.
         </CardTitle>
         <CardDescription className="mt-1.5">

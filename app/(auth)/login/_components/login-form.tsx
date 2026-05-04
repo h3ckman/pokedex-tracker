@@ -81,7 +81,7 @@ export function LoginForm() {
       </div>
 
       <CardHeader className="text-center">
-        <CardTitle className="font-heading text-4xl font-medium italic tracking-tight">
+        <CardTitle className="font-heading text-4xl font-medium tracking-tight">
           Welcome back, Trainer.
         </CardTitle>
         <CardDescription className="mt-1.5">
