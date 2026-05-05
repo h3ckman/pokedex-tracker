@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   PrismaClient,
+  type EvolutionTrigger,
   type GameSystem,
   type PokemonType,
   type Region,
@@ -31,6 +32,8 @@ type SeedPokemon = {
   region: Region;
   spriteUrl: string | null;
   artworkUrl: string | null;
+  shinyArtworkUrl?: string | null;
+  animatedSpriteUrl?: string | null;
   types: string[];
   height: number;
   weight: number;
@@ -42,7 +45,34 @@ type SeedPokemon = {
   specialAttack: number;
   specialDefense: number;
   speed: number;
+  evHp?: number;
+  evAttack?: number;
+  evDefense?: number;
+  evSpecialAttack?: number;
+  evSpecialDefense?: number;
+  evSpeed?: number;
+  weaknesses4x?: string[];
+  weaknesses2x?: string[];
+  resistances1_2?: string[];
+  resistances1_4?: string[];
+  immunities?: string[];
+  captureRate?: number | null;
+  baseHappiness?: number | null;
+  growthRate?: string | null;
+  eggGroups?: string[];
+  genderRate?: number | null;
+  hatchCounter?: number | null;
+  isLegendary?: boolean;
+  isMythical?: boolean;
+  isBaby?: boolean;
+  habitat?: string | null;
+  shape?: string | null;
+  dexColor?: string | null;
   flavorTexts: FlavorText[];
+  evolutionChainRootDex: number | null;
+  evolvesFromDexNumber: number | null;
+  evolutionTrigger: EvolutionTrigger | null;
+  evolutionTriggerLabel: string | null;
 };
 
 type GameSeed = { gameTitle: string; gameSystem: GameSystem; regionName: string };
@@ -144,6 +174,8 @@ async function seedPokemon(): Promise<{ pokemonCount: number; entryCount: number
           region: row.region,
           spriteUrl: row.spriteUrl,
           artworkUrl: row.artworkUrl,
+          shinyArtworkUrl: row.shinyArtworkUrl ?? null,
+          animatedSpriteUrl: row.animatedSpriteUrl ?? null,
           types: toPokemonTypes(row.types),
           height: row.height,
           weight: row.weight,
@@ -155,6 +187,33 @@ async function seedPokemon(): Promise<{ pokemonCount: number; entryCount: number
           specialAttack: row.specialAttack,
           specialDefense: row.specialDefense,
           speed: row.speed,
+          evHp: row.evHp ?? 0,
+          evAttack: row.evAttack ?? 0,
+          evDefense: row.evDefense ?? 0,
+          evSpecialAttack: row.evSpecialAttack ?? 0,
+          evSpecialDefense: row.evSpecialDefense ?? 0,
+          evSpeed: row.evSpeed ?? 0,
+          weaknesses4x: toPokemonTypes(row.weaknesses4x ?? []),
+          weaknesses2x: toPokemonTypes(row.weaknesses2x ?? []),
+          resistances1_2: toPokemonTypes(row.resistances1_2 ?? []),
+          resistances1_4: toPokemonTypes(row.resistances1_4 ?? []),
+          immunities: toPokemonTypes(row.immunities ?? []),
+          captureRate: row.captureRate ?? null,
+          baseHappiness: row.baseHappiness ?? null,
+          growthRate: row.growthRate ?? null,
+          eggGroups: row.eggGroups ?? [],
+          genderRate: row.genderRate ?? null,
+          hatchCounter: row.hatchCounter ?? null,
+          isLegendary: row.isLegendary ?? false,
+          isMythical: row.isMythical ?? false,
+          isBaby: row.isBaby ?? false,
+          habitat: row.habitat ?? null,
+          shape: row.shape ?? null,
+          dexColor: row.dexColor ?? null,
+          evolutionChainRootDex: row.evolutionChainRootDex,
+          evolvesFromDexNumber: row.evolvesFromDexNumber,
+          evolutionTrigger: row.evolutionTrigger,
+          evolutionTriggerLabel: row.evolutionTriggerLabel,
         };
         return prisma.pokemon.upsert({
           where: { nationalDexNumber: row.nationalDexNumber },

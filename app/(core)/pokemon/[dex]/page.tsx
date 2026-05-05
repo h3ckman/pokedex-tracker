@@ -1,12 +1,21 @@
+import { ChevronDownIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pokeball } from "@/components/icons/pokeball";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import type { GameSystem } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
+import { EvolutionaryChain } from "./_components/evolutionary-chain";
+import { SpeciesCard } from "./_components/species-card";
+import { SpriteToggle } from "./_components/sprite-toggle";
 import { StatBars } from "./_components/stat-bars";
 import { TypeBadge } from "./_components/type-badge";
+import { TypeMatchups } from "./_components/type-matchups";
 
 const REGION_LABEL: Record<string, string> = {
   KANTO: "Kanto",
@@ -65,16 +74,30 @@ export default async function PokemonDetailPage({
 
   const pokemon = await prisma.pokemon.findUnique({
     where: { nationalDexNumber: dexNumber },
-    include: {
-      entries: {
-        orderBy: [{ gameSystem: "asc" }, { gameTitle: "asc" }],
-      },
-    },
   });
   if (!pokemon) notFound();
 
-  const entriesBySystem = new Map<GameSystem, typeof pokemon.entries>();
-  for (const e of pokemon.entries) {
+  const [entries, chainMembers] = await Promise.all([
+    prisma.pokedexEntry.findMany({
+      where: { pokemonId: pokemon.id },
+      orderBy: [{ gameSystem: "asc" }, { gameTitle: "asc" }],
+    }),
+    pokemon.evolutionChainRootDex != null
+      ? prisma.pokemon.findMany({
+          where: { evolutionChainRootDex: pokemon.evolutionChainRootDex },
+          select: {
+            nationalDexNumber: true,
+            name: true,
+            spriteUrl: true,
+            evolvesFromDexNumber: true,
+            evolutionTriggerLabel: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const entriesBySystem = new Map<GameSystem, typeof entries>();
+  for (const e of entries) {
     const list = entriesBySystem.get(e.gameSystem) ?? [];
     list.push(e);
     entriesBySystem.set(e.gameSystem, list);
@@ -84,18 +107,13 @@ export default async function PokemonDetailPage({
   return (
     <div className="mx-auto w-full max-w-4xl space-y-8">
       <header className="flex flex-col items-center gap-6 sm:flex-row sm:items-end">
-        <div className="relative flex size-48 shrink-0 items-center justify-center rounded-2xl bg-muted/50 ring-1 ring-border sm:size-56">
-          {pokemon.artworkUrl || pokemon.spriteUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={pokemon.artworkUrl ?? pokemon.spriteUrl ?? ""}
-              alt={pokemon.name}
-              className="size-44 object-contain sm:size-52"
-            />
-          ) : (
-            <Pokeball className="size-32" />
-          )}
-        </div>
+        <SpriteToggle
+          defaultUrl={pokemon.artworkUrl}
+          shinyUrl={pokemon.shinyArtworkUrl}
+          animatedUrl={pokemon.animatedSpriteUrl}
+          spriteUrl={pokemon.spriteUrl}
+          alt={pokemon.name}
+        />
         <div className="flex-1 space-y-3 text-center sm:text-left">
           <p className="font-mono text-sm text-muted-foreground tabular-nums">
             #{pad4(pokemon.nationalDexNumber)}
@@ -127,13 +145,35 @@ export default async function PokemonDetailPage({
         />
       </div>
 
-      <StatBars
-        hp={pokemon.hp}
-        attack={pokemon.attack}
-        defense={pokemon.defense}
-        specialAttack={pokemon.specialAttack}
-        specialDefense={pokemon.specialDefense}
-        speed={pokemon.speed}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <StatBars
+          hp={pokemon.hp}
+          attack={pokemon.attack}
+          defense={pokemon.defense}
+          specialAttack={pokemon.specialAttack}
+          specialDefense={pokemon.specialDefense}
+          speed={pokemon.speed}
+          evHp={pokemon.evHp}
+          evAttack={pokemon.evAttack}
+          evDefense={pokemon.evDefense}
+          evSpecialAttack={pokemon.evSpecialAttack}
+          evSpecialDefense={pokemon.evSpecialDefense}
+          evSpeed={pokemon.evSpeed}
+        />
+        <TypeMatchups
+          weaknesses4x={pokemon.weaknesses4x}
+          weaknesses2x={pokemon.weaknesses2x}
+          resistances1_2={pokemon.resistances1_2}
+          resistances1_4={pokemon.resistances1_4}
+          immunities={pokemon.immunities}
+        />
+      </div>
+
+      <SpeciesCard pokemon={pokemon} />
+
+      <EvolutionaryChain
+        members={chainMembers}
+        currentDexNumber={pokemon.nationalDexNumber}
       />
 
       <section className="space-y-4">
@@ -142,8 +182,7 @@ export default async function PokemonDetailPage({
             Pokédex entries
           </h2>
           <span className="text-sm text-muted-foreground tabular-nums">
-            {pokemon.entries.length} entries across {orderedSystems.length}{" "}
-            systems
+            {entries.length} entries across {orderedSystems.length} systems
           </span>
         </div>
 
@@ -154,45 +193,62 @@ export default async function PokemonDetailPage({
             </CardContent>
           </Card>
         ) : (
-          orderedSystems.map((system) => {
+          orderedSystems.map((system, index) => {
             const entries = entriesBySystem.get(system) ?? [];
             return (
               <Card key={system}>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between text-base">
-                    <span>{SYSTEM_LABEL[system]}</span>
-                    <span className="text-xs font-normal text-muted-foreground tabular-nums">
-                      {entries.length}{" "}
-                      {entries.length === 1 ? "game" : "games"}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {entries.map((e) => (
-                    <div
-                      key={e.id}
-                      className="rounded-md border bg-background p-3"
-                    >
-                      <div className="mb-1 flex items-baseline justify-between gap-2">
-                        <span className="text-sm font-semibold">
-                          {e.gameTitle}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {e.regionName}
-                        </span>
-                      </div>
-                      {e.flavorText ? (
-                        <p className="text-sm leading-relaxed text-foreground/80">
-                          {e.flavorText}
-                        </p>
-                      ) : (
-                        <p className="text-sm italic text-muted-foreground">
-                          No entry recorded.
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </CardContent>
+                <Collapsible defaultOpen={index === 0}>
+                  <CollapsibleTrigger
+                    render={
+                      <button
+                        type="button"
+                        className="group/entries flex w-full items-center gap-2 text-left"
+                      >
+                        <CardHeader className="flex-1">
+                          <CardTitle className="flex items-center justify-between text-base">
+                            <span>{SYSTEM_LABEL[system]}</span>
+                            <span className="text-xs font-normal text-muted-foreground tabular-nums">
+                              {entries.length}{" "}
+                              {entries.length === 1 ? "game" : "games"}
+                            </span>
+                          </CardTitle>
+                        </CardHeader>
+                        <ChevronDownIcon
+                          className="mr-6 size-4 shrink-0 text-muted-foreground transition-transform duration-150 group-data-[panel-open]/entries:rotate-180"
+                          aria-hidden
+                        />
+                      </button>
+                    }
+                  />
+                  <CollapsibleContent>
+                    <CardContent className="space-y-3">
+                      {entries.map((e) => (
+                        <div
+                          key={e.id}
+                          className="rounded-md border bg-background p-3"
+                        >
+                          <div className="mb-1 flex items-baseline justify-between gap-2">
+                            <span className="text-sm font-semibold">
+                              {e.gameTitle}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {e.regionName}
+                            </span>
+                          </div>
+                          {e.flavorText ? (
+                            <p className="text-sm leading-relaxed text-foreground/80">
+                              {e.flavorText}
+                            </p>
+                          ) : (
+                            <p className="text-sm italic text-muted-foreground">
+                              No entry recorded.
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </CardContent>
+                  </CollapsibleContent>
+                </Collapsible>
               </Card>
             );
           })

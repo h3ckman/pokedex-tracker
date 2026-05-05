@@ -59,6 +59,14 @@ enum PokemonType {
   FAIRY
 }
 
+enum EvolutionTrigger {
+  LEVEL_UP
+  USE_ITEM
+  TRADE
+  SHED
+  OTHER
+}
+
 
 model User {
   id            String    @id @default(cuid())
@@ -146,6 +154,46 @@ model Pokemon {
   specialAttack     Int?
   specialDefense    Int?
   speed             Int?
+  // Plain Int (not a Prisma relation) — refs another Pokemon by nationalDexNumber.
+  evolvesFromDexNumber  Int?
+  evolutionChainRootDex Int?
+  evolutionTrigger      EvolutionTrigger?
+  evolutionTriggerLabel String?
+
+  // Type effectiveness — derived once during ingest from /type/{name}.
+  weaknesses4x   PokemonType[]
+  weaknesses2x   PokemonType[]
+  resistances1_2 PokemonType[]
+  resistances1_4 PokemonType[]
+  immunities     PokemonType[]
+
+  // Sprite variants.
+  shinyArtworkUrl   String?
+  animatedSpriteUrl String?
+
+  // Species / breeding (from /pokemon-species/{id}).
+  captureRate   Int?
+  baseHappiness Int?
+  growthRate    String?
+  eggGroups     String[]
+  // -1 = genderless, otherwise N/8 chance female.
+  genderRate    Int?
+  hatchCounter  Int?
+  isLegendary   Boolean  @default(false)
+  isMythical    Boolean  @default(false)
+  isBaby        Boolean  @default(false)
+  habitat       String?
+  shape         String?
+  dexColor      String?
+
+  // EV yields per stat.
+  evHp             Int @default(0)
+  evAttack         Int @default(0)
+  evDefense        Int @default(0)
+  evSpecialAttack  Int @default(0)
+  evSpecialDefense Int @default(0)
+  evSpeed          Int @default(0)
+
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -154,6 +202,7 @@ model Pokemon {
   @@index([name])
   @@index([generation])
   @@index([region])
+  @@index([evolutionChainRootDex])
 }
 
 model PokedexEntry {

@@ -11,7 +11,7 @@ const STAT_FILL: Record<string, string> = {
   Speed: "bg-pink-500",
 };
 
-type Stat = { label: string; value: number | null };
+type Stat = { label: string; value: number | null; ev: number };
 
 export function StatBars({
   hp,
@@ -20,6 +20,12 @@ export function StatBars({
   specialAttack,
   specialDefense,
   speed,
+  evHp = 0,
+  evAttack = 0,
+  evDefense = 0,
+  evSpecialAttack = 0,
+  evSpecialDefense = 0,
+  evSpeed = 0,
 }: {
   hp: number | null;
   attack: number | null;
@@ -27,14 +33,20 @@ export function StatBars({
   specialAttack: number | null;
   specialDefense: number | null;
   speed: number | null;
+  evHp?: number;
+  evAttack?: number;
+  evDefense?: number;
+  evSpecialAttack?: number;
+  evSpecialDefense?: number;
+  evSpeed?: number;
 }) {
   const stats: Stat[] = [
-    { label: "HP", value: hp },
-    { label: "Attack", value: attack },
-    { label: "Defense", value: defense },
-    { label: "Sp. Atk", value: specialAttack },
-    { label: "Sp. Def", value: specialDefense },
-    { label: "Speed", value: speed },
+    { label: "HP", value: hp, ev: evHp },
+    { label: "Attack", value: attack, ev: evAttack },
+    { label: "Defense", value: defense, ev: evDefense },
+    { label: "Sp. Atk", value: specialAttack, ev: evSpecialAttack },
+    { label: "Sp. Def", value: specialDefense, ev: evSpecialDefense },
+    { label: "Speed", value: speed, ev: evSpeed },
   ];
 
   const total = stats.reduce((sum, s) => sum + (s.value ?? 0), 0);
@@ -63,7 +75,7 @@ export function StatBars({
               return (
                 <li
                   key={s.label}
-                  className="grid grid-cols-[5rem_3rem_1fr] items-center gap-3"
+                  className="grid grid-cols-[5rem_3rem_1fr_2.5rem] items-center gap-3"
                 >
                   <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {s.label}
@@ -80,6 +92,14 @@ export function StatBars({
                       aria-hidden
                     />
                   </div>
+                  <span
+                    className={`text-right text-[10px] font-semibold tabular-nums ${
+                      s.ev > 0 ? "text-foreground/70" : "text-transparent"
+                    }`}
+                    aria-label={s.ev > 0 ? `${s.ev} EV yield` : undefined}
+                  >
+                    {s.ev > 0 ? `+${s.ev} EV` : "—"}
+                  </span>
                 </li>
               );
             })}
