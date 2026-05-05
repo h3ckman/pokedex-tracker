@@ -17,21 +17,36 @@ export default async function AuthedLayout({
   if (!session) redirect("/login");
   if (!session.user.emailVerified) redirect("/verify-email");
 
-  const pokemon = await prisma.pokemon.findMany({
-    orderBy: { nationalDexNumber: "asc" },
-    select: {
-      id: true,
-      nationalDexNumber: true,
-      name: true,
-      generation: true,
-      region: true,
-      spriteUrl: true,
-      entries: {
-        distinct: ["gameSystem"],
-        select: { gameSystem: true },
+  const [pokemonRows, userPokemon] = await Promise.all([
+    prisma.pokemon.findMany({
+      orderBy: { nationalDexNumber: "asc" },
+      select: {
+        id: true,
+        nationalDexNumber: true,
+        name: true,
+        generation: true,
+        region: true,
+        spriteUrl: true,
+        entries: {
+          distinct: ["gameSystem"],
+          select: { gameSystem: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.userPokemon.findMany({
+      where: { userId: session.user.id },
+      select: { pokemonId: true, seen: true, caught: true },
+    }),
+  ]);
+
+  const statusByPokemonId = new Map(
+    userPokemon.map((u) => [u.pokemonId, { seen: u.seen, caught: u.caught }]),
+  );
+  const pokemon = pokemonRows.map((p) => ({
+    ...p,
+    seen: statusByPokemonId.get(p.id)?.seen ?? false,
+    caught: statusByPokemonId.get(p.id)?.caught ?? false,
+  }));
 
   return (
     <TooltipProvider>

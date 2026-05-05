@@ -83,6 +83,7 @@ model User {
   auditLogs         AuditLog[]
   oauthAccounts     OAuthAccount[]
   verificationCodes EmailVerificationCode[]
+  caughtPokemon     UserPokemon[]
 }
 
 model Session {
@@ -197,7 +198,8 @@ model Pokemon {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
-  entries PokedexEntry[]
+  entries     PokedexEntry[]
+  userCatches UserPokemon[]
 
   @@index([name])
   @@index([generation])
@@ -219,5 +221,22 @@ model PokedexEntry {
   @@unique([pokemonId, gameTitle])
   @@index([pokemonId])
   @@index([gameSystem])
+}
+
+model UserPokemon {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pokemonId String
+  pokemon   Pokemon   @relation(fields: [pokemonId], references: [id], onDelete: Cascade)
+  seen      Boolean   @default(false)
+  caught    Boolean   @default(false)
+  seenAt    DateTime?
+  caughtAt  DateTime?
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, pokemonId])
+  @@index([userId])
+  @@index([userId, caught])
 }
 

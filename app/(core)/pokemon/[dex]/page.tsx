@@ -14,9 +14,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { getSession } from "@/lib/auth/session";
 import type { GameSystem } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import type { CatchStatus } from "@/lib/actions/pokedex";
 
+import { CatchStatusToggle } from "./_components/catch-status-toggle";
 import { EvolutionaryChain } from "./_components/evolutionary-chain";
 import { SpeciesCard } from "./_components/species-card";
 import { SpriteToggle } from "./_components/sprite-toggle";
@@ -84,7 +87,9 @@ export default async function PokemonDetailPage({
   });
   if (!pokemon) notFound();
 
-  const [entries, chainMembers] = await Promise.all([
+  const session = await getSession();
+
+  const [entries, chainMembers, userPokemon] = await Promise.all([
     prisma.pokedexEntry.findMany({
       where: { pokemonId: pokemon.id },
       orderBy: [{ gameSystem: "asc" }, { gameTitle: "asc" }],
@@ -101,7 +106,21 @@ export default async function PokemonDetailPage({
           },
         })
       : Promise.resolve([]),
+    session
+      ? prisma.userPokemon.findUnique({
+          where: {
+            userId_pokemonId: { userId: session.user.id, pokemonId: pokemon.id },
+          },
+          select: { seen: true, caught: true },
+        })
+      : Promise.resolve(null),
   ]);
+
+  const initialStatus: CatchStatus = userPokemon?.caught
+    ? "caught"
+    : userPokemon?.seen
+      ? "seen"
+      : "none";
 
   const entriesBySystem = new Map<GameSystem, typeof entries>();
   for (const e of entries) {
@@ -133,6 +152,12 @@ export default async function PokemonDetailPage({
             {pokemon.types.map((t) => (
               <TypeBadge key={t} type={t} />
             ))}
+          </div>
+          <div className="flex justify-center sm:justify-start">
+            <CatchStatusToggle
+              pokemonId={pokemon.id}
+              initialStatus={initialStatus}
+            />
           </div>
         </div>
       </header>

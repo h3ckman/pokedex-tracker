@@ -8,6 +8,8 @@ export type SidebarPokemon = {
   region: Region;
   spriteUrl: string | null;
   entries: { gameSystem: GameSystem }[];
+  seen?: boolean;
+  caught?: boolean;
 };
 
 export type ViewMode = "pokedex" | "alphabetical" | "region" | "game-system";
