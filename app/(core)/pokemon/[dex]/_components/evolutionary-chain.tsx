@@ -134,7 +134,7 @@ export function EvolutionaryChain({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex justify-center overflow-x-auto">
+        <div className="flex justify-center">
           <ChainNodeView node={tree} currentDexNumber={currentDexNumber} />
         </div>
       </CardContent>
