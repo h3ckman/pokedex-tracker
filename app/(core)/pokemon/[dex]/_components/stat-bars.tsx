@@ -1,3 +1,5 @@
+import { BarChart3Icon } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const MAX_STAT = 255;
@@ -56,7 +58,10 @@ export function StatBars({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-baseline justify-between text-base">
-          <span>Base stats</span>
+          <span className="flex items-center gap-2">
+            <BarChart3Icon className="size-4 text-muted-foreground" aria-hidden />
+            Base stats
+          </span>
           {hasAny && (
             <span className="text-xs font-normal text-muted-foreground tabular-nums">
               Total {total}

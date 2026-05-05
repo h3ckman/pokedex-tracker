@@ -1,4 +1,16 @@
-import { ChevronDownIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  EggIcon,
+  HeartIcon,
+  HourglassIcon,
+  LeafIcon,
+  PaletteIcon,
+  ShapesIcon,
+  SproutIcon,
+  TargetIcon,
+  TreesIcon,
+  UsersIcon,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,15 +95,18 @@ function CaptureRate({ rate }: { rate: number }) {
 }
 
 function Field({
+  icon,
   label,
   children,
 }: {
+  icon?: React.ReactNode;
   label: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="space-y-1">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {icon}
         {label}
       </p>
       <div className="text-sm">{children}</div>
@@ -125,7 +140,13 @@ export function SpeciesCard({ pokemon }: { pokemon: Pokemon }) {
               className="flex w-full items-center justify-between gap-2 text-left"
             >
               <CardHeader className="flex-1">
-                <CardTitle className="text-base">Species data</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <LeafIcon
+                    className="size-4 text-muted-foreground"
+                    aria-hidden
+                  />
+                  Species data
+                </CardTitle>
               </CardHeader>
               <ChevronDownIcon
                 className="mr-6 size-4 text-muted-foreground transition-transform duration-150 group-data-[panel-open]:rotate-180"
@@ -156,24 +177,36 @@ export function SpeciesCard({ pokemon }: { pokemon: Pokemon }) {
 
             <div className="grid gap-5 sm:grid-cols-2">
               {pokemon.captureRate !== null && (
-                <Field label="Capture rate">
+                <Field
+                  icon={<TargetIcon className="size-3.5" aria-hidden />}
+                  label="Capture rate"
+                >
                   <CaptureRate rate={pokemon.captureRate} />
                 </Field>
               )}
               {pokemon.genderRate !== null && (
-                <Field label="Gender ratio">
+                <Field
+                  icon={<UsersIcon className="size-3.5" aria-hidden />}
+                  label="Gender ratio"
+                >
                   <GenderBar genderRate={pokemon.genderRate} />
                 </Field>
               )}
               {pokemon.baseHappiness !== null && (
-                <Field label="Base friendship">
+                <Field
+                  icon={<HeartIcon className="size-3.5" aria-hidden />}
+                  label="Base friendship"
+                >
                   <span className="font-semibold tabular-nums">
                     {pokemon.baseHappiness}
                   </span>
                 </Field>
               )}
               {pokemon.hatchCounter !== null && (
-                <Field label="Hatch cycles">
+                <Field
+                  icon={<HourglassIcon className="size-3.5" aria-hidden />}
+                  label="Hatch cycles"
+                >
                   <span className="font-semibold tabular-nums">
                     {pokemon.hatchCounter}
                     <span className="ml-2 text-xs font-normal text-muted-foreground">
@@ -183,14 +216,20 @@ export function SpeciesCard({ pokemon }: { pokemon: Pokemon }) {
                 </Field>
               )}
               {pokemon.growthRate && (
-                <Field label="Growth rate">
+                <Field
+                  icon={<SproutIcon className="size-3.5" aria-hidden />}
+                  label="Growth rate"
+                >
                   <span className="font-medium">
                     {titleCase(pokemon.growthRate)}
                   </span>
                 </Field>
               )}
               {pokemon.eggGroups.length > 0 && (
-                <Field label="Egg groups">
+                <Field
+                  icon={<EggIcon className="size-3.5" aria-hidden />}
+                  label="Egg groups"
+                >
                   <div className="flex flex-wrap gap-1.5">
                     {pokemon.eggGroups.map((g) => (
                       <Badge key={g} variant="secondary">
@@ -201,13 +240,28 @@ export function SpeciesCard({ pokemon }: { pokemon: Pokemon }) {
                 </Field>
               )}
               {pokemon.habitat && (
-                <Field label="Habitat">{titleCase(pokemon.habitat)}</Field>
+                <Field
+                  icon={<TreesIcon className="size-3.5" aria-hidden />}
+                  label="Habitat"
+                >
+                  {titleCase(pokemon.habitat)}
+                </Field>
               )}
               {pokemon.shape && (
-                <Field label="Shape">{titleCase(pokemon.shape)}</Field>
+                <Field
+                  icon={<ShapesIcon className="size-3.5" aria-hidden />}
+                  label="Shape"
+                >
+                  {titleCase(pokemon.shape)}
+                </Field>
               )}
               {pokemon.dexColor && (
-                <Field label="Dex color">{titleCase(pokemon.dexColor)}</Field>
+                <Field
+                  icon={<PaletteIcon className="size-3.5" aria-hidden />}
+                  label="Dex color"
+                >
+                  {titleCase(pokemon.dexColor)}
+                </Field>
               )}
             </div>
           </CardContent>

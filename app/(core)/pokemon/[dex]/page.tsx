@@ -1,4 +1,11 @@
-import { ChevronDownIcon } from "lucide-react";
+import {
+  BookOpenIcon,
+  ChevronDownIcon,
+  MapPinIcon,
+  RulerIcon,
+  WeightIcon,
+  ZapIcon,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,14 +138,24 @@ export default async function PokemonDetailPage({
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Height" value={formatHeight(pokemon.height)} />
-        <StatCard label="Weight" value={formatWeight(pokemon.weight)} />
         <StatCard
+          icon={<RulerIcon className="size-4" aria-hidden />}
+          label="Height"
+          value={formatHeight(pokemon.height)}
+        />
+        <StatCard
+          icon={<WeightIcon className="size-4" aria-hidden />}
+          label="Weight"
+          value={formatWeight(pokemon.weight)}
+        />
+        <StatCard
+          icon={<MapPinIcon className="size-4" aria-hidden />}
           label="Generation"
           value={`Gen ${pokemon.generation}`}
           sub={REGION_LABEL[pokemon.region] ?? pokemon.region}
         />
         <StatCard
+          icon={<ZapIcon className="size-4" aria-hidden />}
           label="Abilities"
           value={pokemon.abilities[0] ?? "—"}
           sub={pokemon.abilities.slice(1).join(" · ") || undefined}
@@ -178,7 +195,8 @@ export default async function PokemonDetailPage({
 
       <section className="space-y-4">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-2xl font-semibold tracking-tight">
+          <h2 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+            <BookOpenIcon className="size-5 text-muted-foreground" aria-hidden />
             Pokédex entries
           </h2>
           <span className="text-sm text-muted-foreground tabular-nums">
@@ -259,10 +277,12 @@ export default async function PokemonDetailPage({
 }
 
 function StatCard({
+  icon,
   label,
   value,
   sub,
 }: {
+  icon?: React.ReactNode;
   label: string;
   value: string;
   sub?: string;
@@ -270,7 +290,8 @@ function StatCard({
   return (
     <Card>
       <CardContent className="py-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {icon}
           {label}
         </p>
         <p className="mt-1 text-lg font-semibold">{value}</p>

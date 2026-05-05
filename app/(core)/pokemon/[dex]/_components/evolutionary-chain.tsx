@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, GitBranchIcon } from "lucide-react";
 
 import { Pokeball } from "@/components/icons/pokeball";
 import { Badge } from "@/components/ui/badge";
@@ -128,7 +128,10 @@ export function EvolutionaryChain({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Evolution chain</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <GitBranchIcon className="size-4 text-muted-foreground" aria-hidden />
+          Evolution chain
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex justify-center overflow-x-auto">

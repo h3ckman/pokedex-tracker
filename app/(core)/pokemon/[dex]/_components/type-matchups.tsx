@@ -1,3 +1,5 @@
+import { ShieldIcon } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PokemonType } from "@/lib/generated/prisma/client";
 
@@ -34,7 +36,10 @@ export function TypeMatchups({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-baseline justify-between text-base">
-          <span>Damage taken</span>
+          <span className="flex items-center gap-2">
+            <ShieldIcon className="size-4 text-muted-foreground" aria-hidden />
+            Damage taken
+          </span>
           <span className="text-xs font-normal text-muted-foreground">
             vs. attacking type
           </span>
