@@ -137,7 +137,7 @@ export default async function PokemonDetailPage({
         </div>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           icon={<RulerIcon className="size-4" aria-hidden />}
           label="Height"
@@ -196,7 +196,10 @@ export default async function PokemonDetailPage({
       <section className="space-y-4">
         <div className="flex items-baseline justify-between">
           <h2 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            <BookOpenIcon className="size-5 text-muted-foreground" aria-hidden />
+            <BookOpenIcon
+              className="size-5 text-muted-foreground"
+              aria-hidden
+            />
             Pokédex entries
           </h2>
           <span className="text-sm text-muted-foreground tabular-nums">
